@@ -9,7 +9,7 @@ fi
 
 INSTALL_DIR="$HOME/.local/bin"
 mkdir -p "$INSTALL_DIR"
-URL="https://github.com/YOUR_USER/Cap2Cat/releases/latest/download/cap2cat"
+URL="https://github.com/zoldyck13/Cap2Cat/releases/download/v1.0.0/cap2cat-linux-x64"
 
 echo -e "\e[33m[+] Downloading Cap2Cat Binary...\e[0m"
 curl -L $URL -o "$INSTALL_DIR/cap2cat"

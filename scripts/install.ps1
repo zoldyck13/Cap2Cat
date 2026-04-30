@@ -3,7 +3,7 @@ Write-Host "--- [ Cap2Cat: Windows Deployment ] ---" -ForegroundColor Cyan
 $installDir = "$HOME\.cap2cat"
 if (!(Test-Path $installDir)) { New-Item -ItemType Directory -Path $installDir }
 
-$url = "https://github.com/YOUR_USER/Cap2Cat/releases/latest/download/cap2cat.exe"
+$url = "https://github.com/zoldyck13/Cap2Cat/releases/download/v1.0.0/cap2cat-win-x64.exe"
 $exePath = "$installDir\cap2cat.exe"
 
 Write-Host "[+] Downloading Cap2Cat..." -ForegroundColor Yellow
