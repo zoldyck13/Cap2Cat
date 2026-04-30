@@ -23,6 +23,7 @@ class Utils{
         static std::string getCrackedPassword(const std::string& hashFile);
 
         static void showLoadingAnimation(std::atomic<bool>& keepRunning, const std::string& message);
+        static bool runAIPredictor(const std::string& keyword, int count, float temp, const std::string& outputFile);
 };
 
 #endif

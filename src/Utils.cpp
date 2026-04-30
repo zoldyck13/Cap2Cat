@@ -143,3 +143,49 @@ void Utils::showLoadingAnimation(std::atomic<bool>& keepRunning, const std::stri
     }
     std::cout << "\r" << std::string(60, ' ') << "\r"; 
 }
+
+bool Utils::runAIPredictor(const std::string& keyword, int count, float temp, const std::string& outputFile) {
+    std::string venvPython;
+    std::string venvPath = "venv";
+
+
+    #ifdef _WIN32
+        venvPython = venvPath + "\\Scripts\\python.exe";
+        std::string pipCmd = venvPath + "\\Scripts\\pip.exe install torch";
+        std::string pipCmd = venvPath + "\\Scripts\\pip.exe install numpy";
+    #else
+        venvPython = "./" + venvPath + "/bin/python3";
+        std::string pipCmd = "./" + venvPath + "/bin/pip install torch";
+        std::string pipCmd = venvPath + "/bin/pip install torch numpy";
+    #endif
+
+
+    if (!fs::exists(venvPython)) {
+        std::cout << "[*] First-time setup: Creating virtual environment...\n";
+        
+
+        if (std::system("python3 -m venv venv") != 0 && std::system("python -m venv venv") != 0) {
+            std::cerr << "[!] Critical Error: Could not create venv. Is Python installed?\n";
+            return false;
+        }
+
+        std::cout << "[*] Installing dependencies (torch)... This may take a minute.\n";
+
+        if (std::system(pipCmd.c_str()) != 0) {
+            std::cerr << "[!] Error: Failed to install torch inside venv.\n";
+            return false;
+        }
+        std::cout << "[+] Setup complete!\n";
+    }
+
+
+    std::string command = venvPython + " main.py --predict-model --keyword \"" + keyword + 
+                          "\" --count " + std::to_string(count) + 
+                          " --temp " + std::to_string(temp) + 
+                          " --output " + outputFile + " --leet";
+
+    std::cout << "[*] AI Predictor is running...\n";
+    int result = std::system(command.c_str());
+    
+    return (result == 0);
+}

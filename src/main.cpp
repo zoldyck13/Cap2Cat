@@ -40,14 +40,44 @@ int main(int argc, char* argv[]) {
         Utils::searchHistory(argv[2]);
         return 0;
     }
-
+    
+    if (firstArg == "--gen-only") {
     if (argc < 3) {
-        std::cout << "Usage: cap2cat <handshake.cap> <wordlist.txt>\n";
+        std::cout << "Usage: cap2cat --gen-only <\"keyword\">\n";
         return 1;
     }
+    std::string keyword = argv[2];
+    Utils::runAIPredictor(keyword, 1000, 1.1, "generated_list.txt");
+    std::cout << "[+] Wordlist generated successfully. You can find it in generated_list.txt\n";
+    return 0; 
+}
+    
+    std::string inputCap;
+    std::string wordlist;
 
-    std::string inputCap = argv[1];
-    std::string wordlist = argv[2];
+    if (firstArg == "--predict") {
+        if (argc < 4) {
+            std::cout << "Usage: cap2cat --predict <\"keyword\"> <handshake.cap>\n";
+            return 1;
+        }
+        std::string keyword = argv[2];
+        inputCap = argv[3];
+        wordlist = "ai_generated_list.txt";
+
+        
+        if (!Utils::runAIPredictor(keyword, 1000, 1.1, wordlist)) {
+            std::cerr << "[!] Error: AI Prediction engine failed.\n";
+            return 1;
+        }
+    } else {
+        
+        if (argc < 3) {
+            std::cout << "Usage: cap2cat <handshake.cap> <wordlist.txt>\n";
+            return 1;
+        }
+        inputCap = argv[1];
+        wordlist = argv[2];
+    }
 
     std::cout << "--- [ Cap2Cat: Starting Deployment ] ---\n";
 
