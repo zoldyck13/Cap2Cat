@@ -3,7 +3,7 @@
 
 #include <string>
 #include <filesystem>
-
+#include <atomic>
 namespace fs = std::filesystem;
 
 
@@ -20,7 +20,9 @@ class Utils{
         static void showHistory();
         static void searchHistory(const std::string& ssid);
         static std::string getSSIDFromCap(const std::string& capPath); 
-        static std::string getCrackedPassword(const std::string& hashFile); 
+        static std::string getCrackedPassword(const std::string& hashFile);
+
+        static void showLoadingAnimation(std::atomic<bool>& keepRunning, const std::string& message);
 };
 
 #endif

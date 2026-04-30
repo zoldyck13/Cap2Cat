@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <thread>
+#include <chrono>
+#include <cstdio>
 
 #ifdef _WIN32
     #define NULL_DEVICE "NUL"
@@ -82,40 +85,61 @@ void Utils::searchHistory(const std::string& ssid) {
 }
 
 
-std::string Utils::getCrackedPassword(const std::string& hashFile) {
-    std::ifstream hFile(hashFile);
-    std::string firstLine, targetHash;
-    if (std::getline(hFile, firstLine)) {
-        if (firstLine.length() >= 32)
-            targetHash = firstLine.substr(0, 32); 
+
+ std::string Utils::getCrackedPassword(const std::string& hashFile) {
+    std::string cmd = "hashcat -m 22000 --show \"" + hashFile + "\" 2>/dev/null";
+    char buffer[256];
+    std::string result = "";
+    
+#ifdef _WIN32
+    FILE* pipe = _popen(cmd.c_str(), "r");
+#else
+    FILE* pipe = popen(cmd.c_str(), "r");
+#endif
+
+    if (!pipe) return "";
+    
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        result += buffer;
     }
-    hFile.close();
 
-    if (targetHash.empty()) return "";
+#ifdef _WIN32
+    _pclose(pipe);
+#else
+    pclose(pipe);
+#endif
 
-    const char* homeEnv = std::getenv("HOME");
-    std::string home = (homeEnv != nullptr) ? std::string(homeEnv) : "";
-
-    std::vector<std::string> potPaths = {
-        home + "/.local/share/hashcat/hashcat.potfile",
-        home + "/.hashcat/hashcat.potfile",
-        "hashcat.potfile"
-    };
-
-    for (const auto& path : potPaths) {
-        std::ifstream pot(path);
-        if (!pot.is_open()) continue;
-
-        std::string line;
-        while (std::getline(pot, line)) {
-            // إذا وجدنا الهاش في السطر
-            if (line.find(targetHash) != std::string::npos) {
-                size_t lastColon = line.find_last_of(':');
-                if (lastColon != std::string::npos) {
-                    return line.substr(lastColon + 1); 
-                }
-            }
+    if (!result.empty()) {
+        while (!result.empty() && (result.back() == '\n' || result.back() == '\r')) {
+            result.pop_back();
+        }
+        
+        size_t lastColon = result.find_last_of(':');
+        if (lastColon != std::string::npos) {
+            return result.substr(lastColon + 1);
         }
     }
+    
     return "";
+}
+
+
+
+void Utils::showLoadingAnimation(std::atomic<bool>& keepRunning, const std::string& message) {
+    const std::vector<std::string> spinner = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
+    int i = 0;
+    auto startTime = std::chrono::steady_clock::now();
+
+    while (keepRunning) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+
+        
+        std::cout << "\r\033[35m" << spinner[i % spinner.size()] << "\033[0m " 
+                  << message << " [Time: " << elapsed << "s] " << std::flush;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        i++;
+    }
+    std::cout << "\r" << std::string(60, ' ') << "\r"; 
 }

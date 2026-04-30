@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
+#include <atomic>
 #include "Utils.hpp"
 
 
@@ -77,16 +79,37 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
+    std::atomic<bool> keepRunning(true);
+    std::string msg = "Cracking in progess... (Press 's' for status)";
+
+    std::thread animationThread([&]() {
+            Utils::showLoadingAnimation(std::ref(keepRunning), msg);
+        });
+
+
+
     std::cout << "[+] Starting Hashcat with Mode 22000...\n";
     
-    std::string crackCmd = "hashcat -m 22000 " + outputHash + " " + cleanWordlist;
-
+    std::string crackCmd = "hashcat -m 22000 " + outputHash + " " + cleanWordlist + " --status --status-timer=5";
     int result = std::system(crackCmd.c_str());
 
-    if (result == 0) {
-        std::cout << "\n[***] Success! Check Hashcat output for the password.\n";
+    keepRunning = false;
+    if (animationThread.joinable()) {
+        animationThread.join();
+    }
+
+    if (result == 0 || result == 1) { // 0: كسر، 1: انتهى الـ potfile
+        std::string password = Utils::getCrackedPassword(outputHash);
+        if (!password.empty()) {
+            std::string ssid = fs::path(cleanCap).stem().string();
+            Utils::saveToHistory(ssid, password);
+            std::cout << "\n[***] Success! SSID: " << ssid << " | Password: " << password << "\n";
+        } else {
+            std::cout << "\n[!] Hashcat finished, but no password found in potfile.\n";
+        }
     } else {
-        std::cerr << "\n[!] Hashcat finished with an error or was stopped.\n";
+        std::cerr << "\n[!] Hashcat was interrupted or failed.\n";
     }
 
     return 0;
