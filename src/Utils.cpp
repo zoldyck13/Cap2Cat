@@ -39,12 +39,18 @@ bool Utils::isValidHandshakeFile(const std::string& filePath){
 }
 
 void Utils::saveToHistory(const std::string& ssid, const std::string& password) {
-    std::string homeDir = getenv("HOME");
-    std::ofstream historyFile(homeDir + "/.cap2cat_history", std::ios::app);
-    if (historyFile.is_open()) {
-        historyFile << ssid << ":" << password << std::endl;
-        historyFile.close();
+    std::string home = getenv("HOME");
+    std::string path = home + "/.cap2cat_history";
+    
+    std::ifstream check(path);
+    std::string line;
+    while (std::getline(check, line)) {
+        if (line == (ssid + ":" + password)) return; 
     }
+    check.close();
+
+    std::ofstream file(path, std::ios::app);
+    file << ssid << ":" << password << "\n";
 }
 
 void Utils::showHistory() {
@@ -75,3 +81,41 @@ void Utils::searchHistory(const std::string& ssid) {
     if (!found) std::cout << "\n[!] No records for SSID: " << ssid << std::endl;
 }
 
+
+std::string Utils::getCrackedPassword(const std::string& hashFile) {
+    std::ifstream hFile(hashFile);
+    std::string firstLine, targetHash;
+    if (std::getline(hFile, firstLine)) {
+        if (firstLine.length() >= 32)
+            targetHash = firstLine.substr(0, 32); 
+    }
+    hFile.close();
+
+    if (targetHash.empty()) return "";
+
+    const char* homeEnv = std::getenv("HOME");
+    std::string home = (homeEnv != nullptr) ? std::string(homeEnv) : "";
+
+    std::vector<std::string> potPaths = {
+        home + "/.local/share/hashcat/hashcat.potfile",
+        home + "/.hashcat/hashcat.potfile",
+        "hashcat.potfile"
+    };
+
+    for (const auto& path : potPaths) {
+        std::ifstream pot(path);
+        if (!pot.is_open()) continue;
+
+        std::string line;
+        while (std::getline(pot, line)) {
+            // إذا وجدنا الهاش في السطر
+            if (line.find(targetHash) != std::string::npos) {
+                size_t lastColon = line.find_last_of(':');
+                if (lastColon != std::string::npos) {
+                    return line.substr(lastColon + 1); 
+                }
+            }
+        }
+    }
+    return "";
+}
