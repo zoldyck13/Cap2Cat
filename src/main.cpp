@@ -12,6 +12,33 @@
 
 
 int main(int argc, char* argv[]) {
+    
+    if (argc < 2) {
+        std::cout << "Usage:\n";
+        std::cout << "  cap2cat <handshake.cap> <wordlist.txt>  \n";
+        std::cout << "  cap2cat --show                          \n";
+        std::cout << "  cap2cat --search <SSID>                 \n";
+        return 1;
+    }
+
+
+    std::string firstArg = argv[1];
+
+    
+    if (firstArg == "--show") {
+        Utils::showHistory();
+        return 0;
+    }
+    
+    if (firstArg == "--search") {
+        if (argc < 3) {
+            std::cout << "Usage: cap2cat --search <SSID>\n";
+            return 1;
+        }
+        Utils::searchHistory(argv[2]);
+        return 0;
+    }
+
     if (argc < 3) {
         std::cout << "Usage: cap2cat <handshake.cap> <wordlist.txt>\n";
         return 1;

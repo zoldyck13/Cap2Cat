@@ -14,6 +14,13 @@ class Utils{
         static std::string sanitizePath(const std::string& rawPath);
 
         static bool isValidHandshakeFile(const std::string& filePath);
+
+
+        static void saveToHistory(const std::string& ssid, const std::string& password);
+        static void showHistory();
+        static void searchHistory(const std::string& ssid);
+        static std::string getSSIDFromCap(const std::string& capPath); 
+        static std::string getCrackedPassword(const std::string& hashFile); 
 };
 
 #endif
