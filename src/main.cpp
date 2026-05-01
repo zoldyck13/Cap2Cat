@@ -3,6 +3,7 @@
 #include <vector>
 #include <thread>
 #include <atomic>
+#include <iomanip>
 #include "Utils.hpp"
 
 
@@ -13,18 +14,53 @@
 #endif
 
 
+void printUsage(const char* exeName) {
+
+    std::cout << "\033[1;36m      ::::::::      :::     :::::::::   ::::::::   ::::::::  ::::::::::: \033[0m\n";
+    std::cout << "\033[1;36m    :+:    :+:   :+: :+:   :+:    :+: :+:    :+: :+:    :+:     :+:     \033[0m\n";
+    std::cout << "\033[1;36m   +:+         +:+   +:+  +:+    +:+       +:+  +:+            +:+      \033[0m\n";
+    std::cout << "\033[1;36m  +#+        +#++:++#++: +#++:++#+     +#++:   +#+            +#+       \033[0m\n";
+    std::cout << "\033[1;36m +#+        +#+     +#+ +#+             +#+    +#+            +#+        \033[0m\n";
+    std::cout << "\033[1;36m#+#    #+# #+#     #+# #+#      #+#    #+#    #+#    #+#     #+#         \033[0m\n";
+    std::cout << "\033[1;36m ########  ###     ### ###       ########      ########      ###        \033[0m\n";
+    std::cout << "\n\033[1;36mCap2Cat v1.2.3\033[0m | AI-Powered WPA/WPA2 Cracker\n\n";
+    
+    std::cout << "\033[1;33mUSAGE:\033[0m\n";
+    std::cout << "  " << exeName << " [COMMAND/OPTION] <input>\n\n";
+
+    std::cout << "\033[1;33mCORE COMMANDS:\033[0m\n";
+    std::cout << "  <cap> <wordlist>             " << "Manual crack using an existing wordlist\n";
+    std::cout << "  --predict <key> <cap>        " << "Generate AI wordlist and start cracking immediately\n";
+    std::cout << "  --gen-only <key> <n> <t> <o> " << "AI Generation (Keyword, Count, Temp, Output Name)\n";
+    std::cout << "  --search <SSID>              " << "Search for a cracked password in history\n";
+    std::cout << "  --show                       " << "Display all previously cracked networks\n\n";
+
+    std::cout << "\033[1;33mAI GENERATION OPTIONS:\033[0m\n";
+    std::cout << std::left << std::setw(31) << "  -t, --temp <float>" << "Randomness factor (0.1 to 1.5, Default: 1.1)\n";
+    std::cout << std::left << std::setw(31) << "  -c, --count <int>"   << "Number of candidates (Default: 1000)\n\n";
+
+    std::cout << "\033[1;33mEXAMPLES:\033[0m\n";
+    std::cout << "  cap2cat capture.cap rockyou.txt\n";
+    std::cout << "  cap2cat --predict \"Ali Saad\" handshake.cap\n";
+    std::cout << "  cap2cat --gen-only \"Admin\" 5000 1.2 custom_list.txt\n";
+    
+    std::cout << "\n\033[0;90mDeveloped by Ali Saad \033[0m\n";
+}
+
+
 int main(int argc, char* argv[]) {
     
     if (argc < 2) {
-        std::cout << "Usage:\n";
-        std::cout << "  cap2cat <handshake.cap> <wordlist.txt>  \n";
-        std::cout << "  cap2cat --show                          \n";
-        std::cout << "  cap2cat --search <SSID>                 \n";
+        printUsage(argv[0]);
         return 1;
     }
 
-
     std::string firstArg = argv[1];
+    
+    if (firstArg == "--help" || firstArg == "-h") {
+    printUsage(argv[0]);
+    return 0;
+  }
 
     
     if (firstArg == "--show") {
@@ -54,7 +90,7 @@ int main(int argc, char* argv[]) {
     int rangeInt = std::stoi(range);
     int tempInt = std::stoi(temp);
     
-    Utils::runAIPredictor(keyword, rangeInt, tempInt=1.1, outputName);
+    Utils::runAIPredictor(keyword, rangeInt, tempInt, outputName);
     std::cout << "[+] Wordlist generated successfully. You can find it in " << outputName <<"\n";
     return 0; 
 }

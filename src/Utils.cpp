@@ -9,6 +9,15 @@
 #include <chrono>
 #include <cstdio>
 
+
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN    "\033[36m"
+
 #ifdef _WIN32
     #define NULL_DEVICE "NUL"
 #else 
@@ -16,7 +25,6 @@
 #endif
 
 namespace fs = std::filesystem;
-
 
 bool Utils::isToolInstalled(const std::string& toolName){
     std::string checkCmd = toolName + " --version > " + NULL_DEVICE + " 2>&1";
@@ -37,7 +45,6 @@ bool Utils::isValidHandshakeFile(const std::string& filePath){
     fs::path p(filePath);
     std::string ext = p.extension().string();
     for(auto &c : ext) c = std::tolower(c);
-
     return (ext == ".cap" || ext == ".pcap" || ext == ".pcapng");
 }
 
@@ -60,13 +67,13 @@ void Utils::showHistory() {
     std::string homeDir = getenv("HOME");
     std::ifstream historyFile(homeDir + "/.cap2cat_history");
     std::string line;
-    std::cout << "\n--- [ Cap2Cat Cracked History ] ---\n";
+    std::cout << CYAN << "\n--- [ Cap2Cat Cracked History ] ---" << RESET << "\n";
     if (!historyFile.is_open()) {
-        std::cout << "No history found yet.\n";
+        std::cout << YELLOW << "No history found yet." << RESET << "\n";
         return;
     }
     while (std::getline(historyFile, line)) {
-        std::cout << "󰖩 " << line << std::endl;
+        std::cout << GREEN << " 󰖩 " << RESET << line << std::endl;
     }
 }
 
@@ -77,16 +84,14 @@ void Utils::searchHistory(const std::string& ssid) {
     bool found = false;
     while (std::getline(historyFile, line)) {
         if (line.find(ssid + ":") == 0) {
-            std::cout << "\n[!] Match Found: " << line << std::endl;
+            std::cout << GREEN << "\n[+] Match Found: " << RESET << line << std::endl;
             found = true;
         }
     }
-    if (!found) std::cout << "\n[!] No records for SSID: " << ssid << std::endl;
+    if (!found) std::cout << RED << "\n[!] No records for SSID: " << RESET << ssid << std::endl;
 }
 
-
-
- std::string Utils::getCrackedPassword(const std::string& hashFile) {
+std::string Utils::getCrackedPassword(const std::string& hashFile) {
     std::string cmd = "hashcat -m 22000 --show \"" + hashFile + "\" 2>/dev/null";
     char buffer[256];
     std::string result = "";
@@ -123,8 +128,6 @@ void Utils::searchHistory(const std::string& ssid) {
     return "";
 }
 
-
-
 void Utils::showLoadingAnimation(std::atomic<bool>& keepRunning, const std::string& message) {
     const std::vector<std::string> spinner = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
     int i = 0;
@@ -134,20 +137,19 @@ void Utils::showLoadingAnimation(std::atomic<bool>& keepRunning, const std::stri
         auto currentTime = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
 
-        
-        std::cout << "\r\033[35m" << spinner[i % spinner.size()] << "\033[0m " 
-                  << message << " [Time: " << elapsed << "s] " << std::flush;
+
+        std::cout << "\r" << MAGENTA << spinner[i % spinner.size()] << RESET << " " 
+                  << message << CYAN << " [Time: " << elapsed << "s] " << RESET << std::flush;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         i++;
     }
-    std::cout << "\r" << std::string(60, ' ') << "\r"; 
+    std::cout << "\r" << std::string(70, ' ') << "\r"; 
 }
 
 bool Utils::runAIPredictor(const std::string& keyword, int count, float temp, const std::string& outputFile) {
     std::string venvPython;
     std::string venvPath = "venv";
-
 
     #ifdef _WIN32
         venvPython = venvPath + "\\Scripts\\python.exe";
@@ -157,32 +159,29 @@ bool Utils::runAIPredictor(const std::string& keyword, int count, float temp, co
         std::string pipCmd = "./" + venvPath + "/bin/pip install torch numpy --quiet";
     #endif
 
-
     if (!fs::exists(venvPython)) {
-        std::cout << "[*] First-time setup: Creating virtual environment...\n";
+        std::cout << YELLOW << "[*] First-time setup: Creating virtual environment..." << RESET << "\n";
         
-
         if (std::system("python3 -m venv venv") != 0 && std::system("python -m venv venv") != 0) {
-            std::cerr << "[!] Critical Error: Could not create venv. Is Python installed?\n";
+            std::cerr << RED << "[!] Critical Error: Could not create venv. Is Python installed?" << RESET << "\n";
             return false;
         }
 
-        std::cout << "[*] Installing dependencies (torch)... This may take a minute.\n";
+        std::cout << YELLOW << "[*] Installing dependencies (torch)... This may take a minute." << RESET << "\n";
 
         if (std::system(pipCmd.c_str()) != 0) {
-            std::cerr << "[!] Error: Failed to install torch inside venv.\n";
+            std::cerr << RED << "[!] Error: Failed to install torch inside venv." << RESET << "\n";
             return false;
         }
-        std::cout << "[+] Setup complete!\n";
+        std::cout << GREEN << "[+] Setup complete!" << RESET << "\n";
     }
-
 
     std::string command = venvPython + " main.py --predict-model --keyword \"" + keyword + 
                           "\" --count " + std::to_string(count) + 
                           " --temp " + std::to_string(temp) + 
                           " --output " + outputFile + " --leet";
 
-    std::cout << "[*] AI Predictor is running...\n";
+    std::cout << CYAN << "[*] AI Predictor is running..." << RESET << "\n";
     int result = std::system(command.c_str());
     
     return (result == 0);
