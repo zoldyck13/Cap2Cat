@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
         animationThread.join();
     }
 
-    if (result == 0 || result == 1) { // 0: كسر، 1: انتهى الـ potfile
+    if (result == 0 || result == 1) { 
         std::string password = Utils::getCrackedPassword(outputHash);
         if (!password.empty()) {
             std::string ssid = fs::path(cleanCap).stem().string();
