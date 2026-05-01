@@ -1,23 +1,32 @@
 #!/bin/bash
 
-echo -e "\e[36m--- [ Cap2Cat: Linux Deployment ] ---\e[0m"
-
-if ! command -v hashcat &> /dev/null; then
-    echo -e "\e[33m[!] Hashcat not found. Installing via pacman...\e[0m"
-    sudo pacman -S --noconfirm hashcat hcxtools
-fi
 
 INSTALL_DIR="$HOME/.local/bin"
 mkdir -p "$INSTALL_DIR"
-URL="https://github.com/zoldyck13/Cap2Cat/releases/download/v1.0.0/cap2cat-linux-x64"
 
-echo -e "\e[33m[+] Downloading Cap2Cat Binary...\e[0m"
-curl -L $URL -o "$INSTALL_DIR/cap2cat"
-chmod +x "$INSTALL_DIR/cap2cat"
+echo -e "\e[36m[*] Downloading Cap2Cat resources...\e[0m"
+
+
+BASE_URL="https://github.com/zoldyck13/Cap2Cat/releases/tag/v1.2.3"
+
+curl -L "$BASE_URL/Cap2Cat" -o "$INSTALL_DIR/Cap2Cat"
+curl -L "$BASE_URL/main.py" -o "$INSTALL_DIR/main.py"
+curl -L "$BASE_URL/cap2cat_ai_model.pth" -o "$INSTALL_DIR/cap2cat_ai_model.pth"
+
+chmod +x "$INSTALL_DIR/Cap2Cat"
+
+
+cd "$INSTALL_DIR"
+if [ ! -d "venv" ]; then
+    echo -e "\e[33m[*] Creating Python Virtual Environment...\e[0m"
+    python3 -m venv venv
+    ./venv/bin/pip install torch numpy --quiet
+fi
+
 
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     echo "export PATH=\$PATH:$INSTALL_DIR" >> ~/.bashrc
-    echo -e "\e[32m[+] Added to PATH. Please restart your terminal or run 'source ~/.bashrc'\e[0m"
+    source ~/.bashrc
 fi
 
-echo -e "\e[32m[***] Installation Complete! Try running 'cap2cat'\e[0m"
+echo -e "\e[32m[+] Installation successful! Run 'Cap2Cat' to begin.\e[0m"

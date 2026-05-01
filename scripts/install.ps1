@@ -1,15 +1,25 @@
-Write-Host "--- [ Cap2Cat: Windows Deployment ] ---" -ForegroundColor Cyan
-
 $installDir = "$HOME\.cap2cat"
 if (!(Test-Path $installDir)) { New-Item -ItemType Directory -Path $installDir }
 
-$url = "https://github.com/zoldyck13/Cap2Cat/releases/download/v1.0.0/cap2cat-win-x64.exe"
-$exePath = "$installDir\cap2cat.exe"
+$baseUrl = "https://github.com/zoldyck13/Cap2Cat/releases/tag/v1.2.3"
 
-Write-Host "[+] Downloading Cap2Cat..." -ForegroundColor Yellow
-Invoke-WebRequest -Uri $url -OutFile $exePath
+Write-Host "[*] Downloading Cap2Cat for Windows..." -ForegroundColor Cyan
+Invoke-WebRequest -Uri "$baseUrl/cap2cat.exe" -OutFile "$installDir\cap2cat.exe"
+Invoke-WebRequest -Uri "$baseUrl/main.py" -OutFile "$installDir\main.py"
+Invoke-WebRequest -Uri "$baseUrl/cap2cat_ai_model.pth" -OutFile "$installDir\cap2cat_ai_model.pth"
 
-$env:Path += ";$installDir"
 
-Write-Host "[!] Success! You can now use 'cap2cat' in this terminal." -ForegroundColor Green
-Write-Host "Usage: cap2cat <file.cap> <wordlist.txt>"
+cd $installDir
+if (!(Test-Path "venv")) {
+    Write-Host "[*] Initializing AI Environment..." -ForegroundColor Yellow
+    python -m venv venv
+    .\venv\Scripts\pip install torch numpy --quiet
+}
+
+
+$path = [Environment]::GetEnvironmentVariable("Path", "User")
+if ($path -notlike "*$installDir*") {
+    [Environment]::SetEnvironmentVariable("Path", "$path;$installDir", "User")
+}
+
+Write-Host "[+] Installation Complete! Restart terminal and type 'cap2cat'." -ForegroundColor Green

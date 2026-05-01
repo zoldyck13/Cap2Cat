@@ -43,12 +43,19 @@ int main(int argc, char* argv[]) {
     
     if (firstArg == "--gen-only") {
     if (argc < 3) {
-        std::cout << "Usage: cap2cat --gen-only <\"keyword\">\n";
+        std::cout << "Usage: cap2cat --gen-only <\"keyword\"> <\"range\"> <\"temp\"> <\"output name\"> \n";
         return 1;
     }
     std::string keyword = argv[2];
-    Utils::runAIPredictor(keyword, 1000, 1.1, "generated_list.txt");
-    std::cout << "[+] Wordlist generated successfully. You can find it in generated_list.txt\n";
+    std::string range = argv[3];
+    std::string temp = argv[4];
+    std::string outputName = argv[5];
+    
+    int rangeInt = std::stoi(range);
+    int tempInt = std::stoi(temp);
+    
+    Utils::runAIPredictor(keyword, rangeInt, tempInt=1.1, outputName);
+    std::cout << "[+] Wordlist generated successfully. You can find it in " << outputName <<"\n";
     return 0; 
 }
     

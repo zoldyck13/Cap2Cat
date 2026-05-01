@@ -151,12 +151,10 @@ bool Utils::runAIPredictor(const std::string& keyword, int count, float temp, co
 
     #ifdef _WIN32
         venvPython = venvPath + "\\Scripts\\python.exe";
-        std::string pipCmd = venvPath + "\\Scripts\\pip.exe install torch";
-        std::string pipCmd = venvPath + "\\Scripts\\pip.exe install numpy";
+        std::string pipCmd = venvPath + "\\Scripts\\pip.exe install torch numpy --quiet";
     #else
         venvPython = "./" + venvPath + "/bin/python3";
-        std::string pipCmd = "./" + venvPath + "/bin/pip install torch";
-        std::string pipCmd = venvPath + "/bin/pip install torch numpy";
+        std::string pipCmd = "./" + venvPath + "/bin/pip install torch numpy --quiet";
     #endif
 
 
