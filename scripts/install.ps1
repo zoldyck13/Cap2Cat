@@ -1,7 +1,7 @@
 $installDir = "$HOME\.cap2cat"
 if (!(Test-Path $installDir)) { New-Item -ItemType Directory -Path $installDir }
 
-$baseUrl = "https://github.com/zoldyck13/Cap2Cat/releases/tag/v1.2.3"
+$baseUrl = "https://github.com/zoldyck13/Cap2Cat/releases/download/v1.2.3"
 
 Write-Host "[*] Downloading Cap2Cat for Windows..." -ForegroundColor Cyan
 Invoke-WebRequest -Uri "$baseUrl/cap2cat.exe" -OutFile "$installDir\cap2cat.exe"

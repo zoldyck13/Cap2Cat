@@ -7,7 +7,7 @@ mkdir -p "$INSTALL_DIR"
 echo -e "\e[36m[*] Downloading Cap2Cat resources...\e[0m"
 
 
-BASE_URL="https://github.com/zoldyck13/Cap2Cat/releases/tag/v1.2.3"
+BASE_URL="https://github.com/zoldyck13/Cap2Cat/releases/download/v1.2.3"
 
 curl -L "$BASE_URL/Cap2Cat" -o "$INSTALL_DIR/Cap2Cat"
 curl -L "$BASE_URL/main.py" -o "$INSTALL_DIR/main.py"
