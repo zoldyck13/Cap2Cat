@@ -1,4 +1,4 @@
-# 🐱 Cap2Cat 
+# 🐈‍⬛ Cap2Cat 
 **AI-Powered WPA/WPA2 Handshake Cracking Suite**
 
 Cap2Cat is a professional, cross-platform C++ tool designed to streamline the process of cracking WPA/WPA2 handshakes. It bridges the gap between traditional wordlist attacks and modern AI by predicting potential passwords based on user-provided keywords.
